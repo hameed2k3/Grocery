@@ -11,7 +11,8 @@
         "install-all": "npm install && npm install --prefix client",
         "seed": "node server/seeder.js",
         "seed:clear": "node server/seeder.js --clear",
-        "build": "npm install --prefix client && npm run build --prefix client",
+        "build": "cd client && npm install && npm run build",
+        "vercel-build": "cd client && npm install && npm run build",
         "heroku-postbuild": "npm run build"
     },
     "keywords": [
