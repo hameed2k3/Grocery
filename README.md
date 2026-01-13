@@ -189,6 +189,69 @@ After running the seeder, you can use these accounts:
 | PUT | `/api/orders/:id/cancel` | Cancel order |
 | GET | `/api/orders/all` | Get all orders (Admin) |
 
+## 🚀 Deployment
+
+This MERN app requires **split deployment**:
+- **Frontend (React)** → Vercel
+- **Backend (Node/Express)** → Render
+
+### Step 1: Deploy Backend on Render
+
+1. Go to [render.com](https://render.com) and create an account
+2. Click **New** → **Web Service**
+3. Connect your GitHub repository
+4. Configure:
+   - **Name**: `freshcart-api`
+   - **Root Directory**: Leave empty (uses root)
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+5. Add Environment Variables:
+   ```
+   NODE_ENV=production
+   PORT=5000
+   MONGODB_URI=your_mongodb_atlas_connection_string
+   JWT_SECRET=your_secure_random_string
+   JWT_EXPIRE=7d
+   JWT_REFRESH_SECRET=another_secure_random_string
+   JWT_REFRESH_EXPIRE=30d
+   CLIENT_URL=https://your-app.vercel.app
+   ```
+6. Click **Create Web Service**
+7. Copy your Render URL (e.g., `https://freshcart-api.onrender.com`)
+
+### Step 2: Deploy Frontend on Vercel
+
+1. Go to [vercel.com](https://vercel.com) and create an account
+2. Click **Add New** → **Project**
+3. Import your GitHub repository
+4. Configure:
+   - **Root Directory**: `client`
+   - **Framework Preset**: Create React App
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `build`
+5. Add Environment Variable:
+   ```
+   REACT_APP_API_URL=https://freshcart-api.onrender.com/api
+   ```
+   (Replace with your actual Render backend URL)
+6. Click **Deploy**
+
+### Step 3: Update Backend CORS
+
+After deploying frontend, update `CLIENT_URL` in Render:
+```
+CLIENT_URL=https://your-app.vercel.app
+```
+
+### Deployment Checklist
+
+- [ ] MongoDB Atlas cluster created
+- [ ] Backend deployed on Render
+- [ ] Environment variables set on Render
+- [ ] Frontend deployed on Vercel
+- [ ] `REACT_APP_API_URL` set on Vercel
+- [ ] `CLIENT_URL` updated on Render
+
 ## 📸 Screenshots
 
 ### Home Page
