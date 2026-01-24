@@ -19,6 +19,7 @@ const {
 
 // Import middleware
 const { notFound, errorHandler } = require('./middleware');
+require('./config/passport'); // Initialize passport strategy
 
 // Initialize express app
 const app = express();
@@ -29,20 +30,13 @@ connectDB();
 // CORS configuration
 const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:3001',
     process.env.CLIENT_URL,
 ].filter(Boolean);
 
+// Permissive CORS for development
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, curl, etc.)
-        if (!origin) return callback(null, true);
-
-        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true, // Reflects the request origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

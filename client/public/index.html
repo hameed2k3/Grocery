@@ -1,49 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#2bee4b" />
-    <meta name="description" content="FreshCart - Your Online Grocery Store. Fresh groceries delivered to your doorstep. Shop organic produce, dairy, bakery, and more." />
-    <meta name="keywords" content="grocery, organic, fresh produce, online shopping, delivery, FreshCart" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: '#2bee4b',
-              'primary-dark': '#25c541',
-              'background-light': '#f6f8f6',
-              'background-dark': '#102213',
-              'accent-yellow': '#fffbeb',
-            },
-            fontFamily: {
-              display: ['Be Vietnam Pro', 'sans-serif'],
-            },
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#FF9933" />
+  <meta name="description"
+    content="FreshCart - Your Online Grocery Store. Fresh groceries delivered to your doorstep. Shop organic produce, dairy, bakery, and more." />
+  <meta name="keywords" content="grocery, organic, fresh produce, online shopping, delivery, FreshCart" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF9933',        /* Indian Saffron */
+            'primary-dark': '#E68A00', /* Darker Saffron */
+            'secondary': '#138808',    /* Indian Green */
+            'secondary-dark': '#0F6B06',
+            'background-light': '#FFF7ED', /* Warm Cream/Orange tint */
+            'background-dark': '#1F2937',  /* Modern Dark Gray */
+            'accent-blue': '#000080',      /* Chakra Blue */
           },
+          fontFamily: {
+            display: ['Poppins', 'Be Vietnam Pro', 'sans-serif'],
+            body: ['Poppins', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
         },
-      }
-    </script>
-    
-    <title>FreshCart - Fresh Groceries Delivered</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+      },
+    }
+  </script>
+
+  <title>FreshCart - Fresh Groceries Delivered</title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+</body>
+
 </html>

@@ -15,7 +15,7 @@ const CheckoutPage = () => {
     const [selectedAddress, setSelectedAddress] = useState(
         user?.addresses?.find(a => a.isDefault)?._id || user?.addresses?.[0]?._id || null
     );
-    const [paymentMethod, setPaymentMethod] = useState('card');
+    const [paymentMethod, setPaymentMethod] = useState('cod');
     const [notes, setNotes] = useState('');
     const [showNewAddress, setShowNewAddress] = useState(false);
     const [newAddress, setNewAddress] = useState({
@@ -28,12 +28,7 @@ const CheckoutPage = () => {
         country: 'India',
     });
 
-    const paymentMethods = [
-        { id: 'card', name: 'Credit/Debit Card', icon: 'credit_card', desc: 'Visa, Mastercard, AMEX' },
-        { id: 'upi', name: 'UPI', icon: 'qr_code', desc: 'Google Pay, PhonePe' },
-        { id: 'wallet', name: 'Wallet', icon: 'account_balance_wallet', desc: 'FreshCart Wallet' },
-        { id: 'cod', name: 'Cash on Delivery', icon: 'payments', desc: 'Pay when delivered' },
-    ];
+    // Payment methods array removed as we only support COD now
 
     const handlePlaceOrder = async () => {
         if (!selectedAddress && !showNewAddress) {
@@ -221,37 +216,21 @@ const CheckoutPage = () => {
                         )}
                     </section>
 
-                    {/* Payment Method */}
+                    {/* Payment Method - Simplified */}
                     <section className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700">
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-primary">credit_card</span>
+                            <span className="material-symbols-outlined text-primary">payments</span>
                             Payment Method
                         </h2>
 
-                        <div className="grid gap-3">
-                            {paymentMethods.map((method) => (
-                                <label
-                                    key={method.id}
-                                    className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === method.id
-                                        ? 'border-primary bg-primary/5'
-                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
-                                        }`}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="payment"
-                                        value={method.id}
-                                        checked={paymentMethod === method.id}
-                                        onChange={() => setPaymentMethod(method.id)}
-                                        className="text-primary focus:ring-primary"
-                                    />
-                                    <span className="material-symbols-outlined text-gray-600 dark:text-gray-400">{method.icon}</span>
-                                    <div>
-                                        <p className="font-medium text-gray-900 dark:text-white">{method.name}</p>
-                                        <p className="text-xs text-gray-500">{method.desc}</p>
-                                    </div>
-                                </label>
-                            ))}
+                        <div className="flex items-center gap-4 p-4 rounded-lg border-2 border-primary bg-primary/5">
+                            <span className="material-symbols-outlined text-primary text-3xl">local_shipping</span>
+                            <div>
+                                <p className="font-bold text-gray-900 dark:text-white">Cash on Delivery</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    Pay securely with cash or UPI when your order arrives.
+                                </p>
+                            </div>
                         </div>
                     </section>
 

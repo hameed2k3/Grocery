@@ -94,12 +94,7 @@ const Footer = () => {
             {/* Bottom Bar */}
             <div className="max-w-[1200px] mx-auto mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
                 <p>© 2024 FreshCart Inc. All rights reserved.</p>
-                <div className="flex gap-6">
-                    <span>Visa</span>
-                    <span>Mastercard</span>
-                    <span>Apple Pay</span>
-                    <span>PayPal</span>
-                </div>
+
             </div>
         </footer>
     );

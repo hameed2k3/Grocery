@@ -91,4 +91,34 @@ router.put('/addresses/:addressId', protect, updateAddress);
  */
 router.delete('/addresses/:addressId', protect, deleteAddress);
 
+/**
+ * @route   GET /api/auth/google
+ * @desc    Initiate Google OAuth
+ * @access  Public
+ */
+const passport = require('passport');
+const { generateTokenPair } = require('../config/jwt');
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+/**
+ * @route   GET /api/auth/google/callback
+ * @desc    Handle Google OAuth Callback
+ * @access  Public
+ */
+router.get(
+    '/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+    (req, res) => {
+        // Successful authentication
+        const { accessToken, refreshToken } = generateTokenPair(req.user);
+
+        // Redirect to client with token
+        // In a real app, strict cookie or postMessage is safer, but query param works for simple MVP
+        // redirecting to a dedicated "auth-success" page on frontend to extract token
+        const redirectUrl = `${process.env.CLIENT_URL || 'http://localhost:3001'}/login?token=${accessToken}&refresh=${refreshToken}`;
+        res.redirect(redirectUrl);
+    }
+);
+
 module.exports = router;

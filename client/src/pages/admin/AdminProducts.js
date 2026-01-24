@@ -228,13 +228,22 @@ const AdminProducts = () => {
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => openEditModal(product)}
+                                                    className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold flex items-center gap-1"
+                                                >
+                                                    <span className="material-symbols-outlined text-base">inventory_2</span>
+                                                    Stock
+                                                </button>
+                                                <button
+                                                    onClick={() => openEditModal(product)}
                                                     className="p-2 text-gray-500 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                                    title="Edit Product"
                                                 >
                                                     <span className="material-symbols-outlined text-xl">edit</span>
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(product._id)}
                                                     className="p-2 text-gray-500 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                                    title="Delete Product"
                                                 >
                                                     <span className="material-symbols-outlined text-xl">delete</span>
                                                 </button>

@@ -65,8 +65,16 @@ const createOrder = asyncHandler(async (req, res) => {
     const estimatedDelivery = new Date();
     estimatedDelivery.setDate(estimatedDelivery.getDate() + 2);
 
+    // Generate unique order number
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const orderNumber = `FC-${year}${month}${random}`;
+
     // Create order
     const order = await Order.create({
+        orderNumber,
         user: req.user.id,
         items: orderItems,
         shippingAddress,

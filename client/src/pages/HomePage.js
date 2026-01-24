@@ -196,31 +196,7 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* CTA Banner */}
-            <section className="px-6 lg:px-10 py-12">
-                <div className="max-w-[1200px] mx-auto">
-                    <div className="bg-primary rounded-2xl p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-8">
-                        <div className="flex flex-col gap-4 text-center lg:text-left">
-                            <h2 className="text-gray-900 text-3xl lg:text-4xl font-black">
-                                Download Our App
-                            </h2>
-                            <p className="text-gray-800 text-lg max-w-md">
-                                Get exclusive deals and track your orders on the go. Available on iOS and Android.
-                            </p>
-                        </div>
-                        <div className="flex gap-4">
-                            <button className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">
-                                <span className="material-symbols-outlined">apple</span>
-                                App Store
-                            </button>
-                            <button className="flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">
-                                <span className="material-symbols-outlined">android</span>
-                                Play Store
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+
         </div>
     );
 };

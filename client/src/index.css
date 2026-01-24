@@ -5,22 +5,29 @@
   box-sizing: border-box;
 }
 
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'Be Vietnam Pro', sans-serif;
+  font-family: 'Poppins', 'Be Vietnam Pro', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f6f8f6;
-  color: #111812;
+  background-color: #FFF7ED;
+  color: #1F2937;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .dark body {
-  background-color: #102213;
-  color: #ffffff;
+  background-color: #1F2937;
+  color: #f9fafb;
 }
 
 /* Material Symbols styling */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Custom scrollbar */
@@ -35,12 +42,13 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c9d5cc;
+  background: #cbd5e1;
   border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2bee4b;
+  background: #FF9933;
 }
 
 /* Focus styles */
@@ -49,88 +57,150 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #2bee4b;
+  outline: 2px solid #FF9933;
   outline-offset: 2px;
+  transition: outline-offset 0.2s ease;
 }
 
 /* Selection styles */
 ::selection {
-  background-color: rgba(43, 238, 75, 0.2);
-  color: #111812;
+  background-color: rgba(255, 153, 51, 0.2);
+  color: #1F2937;
 }
 
-/* Button transitions */
+/* ==========================================
+   SMOOTH TRANSITIONS - Global
+   ========================================== */
+
+/* Button transitions - smoother with cubic-bezier */
 button {
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* Link transitions */
 a {
-  transition: color 0.2s ease;
+  transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Image loading placeholder */
-.img-loading {
-  background: linear-gradient(90deg, #f0f4f1 25%, #e0e8e3 50%, #f0f4f1 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+/* Input transitions */
+input,
+textarea,
+select {
+  transition: border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.25);
+  border-color: #FF9933;
 }
 
-/* Toast customization */
-.toast-success {
-  background: #2bee4b !important;
-  color: #111812 !important;
-}
+/* ==========================================
+   PAGE TRANSITIONS
+   ========================================== */
 
-.toast-error {
-  background: #ef4444 !important;
-  color: white !important;
-}
-
-/* Skeleton loader */
-.skeleton {
-  background: linear-gradient(90deg, #f0f4f1 25%, #e8ece9 50%, #f0f4f1 75%);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
-}
-
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Fade in animation */
+/* Fade in animation - smoother */
 .fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Slide in animation */
+/* Fade in up - for content sections */
+.fade-in-up {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in down - for headers */
+.fade-in-down {
+  animation: fadeInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in from left */
+.slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+.slide-in-right {
+  animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in animation (legacy support) */
 .slide-in {
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideIn {
@@ -138,43 +208,302 @@ a {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
   }
 }
 
-/* Pulse animation */
+/* Scale in animation - for modals/popups */
+.scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ==========================================
+   STAGGERED ANIMATIONS - For lists/grids
+   ========================================== */
+
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+.stagger-6 {
+  animation-delay: 0.3s;
+}
+
+.stagger-7 {
+  animation-delay: 0.35s;
+}
+
+.stagger-8 {
+  animation-delay: 0.4s;
+}
+
+/* Auto stagger for child elements */
+.stagger-children>* {
+  opacity: 0;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+.stagger-children>*:nth-child(7) {
+  animation-delay: 0.35s;
+}
+
+.stagger-children>*:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+.stagger-children>*:nth-child(n+9) {
+  animation-delay: 0.45s;
+}
+
+/* ==========================================
+   LOADING ANIMATIONS
+   ========================================== */
+
+/* Shimmer effect for loading placeholders */
+.img-loading,
+.skeleton {
+  background: linear-gradient(90deg, #f0f4f1 25%, #e8ece9 50%, #f0f4f1 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Pulse animation - smoother */
 .pulse {
-  animation: pulse 2s infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
-    opacity: 0.5;
+    opacity: 0.6;
   }
 }
 
-/* Spin animation */
+/* Spin animation - smoother */
 .spin {
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
+/* Bounce animation */
+.bounce {
+  animation: bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ==========================================
+   MICRO-INTERACTIONS
+   ========================================== */
+
+/* Card hover effect - enhanced */
+.card-hover {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Icon hover effect */
+.icon-hover {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-hover:hover {
+  transform: scale(1.15);
+}
+
+/* Button ripple effect base */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.3s;
+}
+
+.btn-ripple:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: transform 0s, opacity 0s;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Hover glow effect */
+.hover-glow {
+  transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 153, 51, 0.4);
+}
+
+/* ==========================================
+   IMAGE ANIMATIONS
+   ========================================== */
+
+/* Image zoom on hover */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.img-zoom:hover img {
+  transform: scale(1.08);
+}
+
+/* Lazy load image fade in */
+.img-lazy {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.img-lazy.loaded {
+  opacity: 1;
+}
+
+/* ==========================================
+   TOAST CUSTOMIZATION
+   ========================================== */
+
+.toast-success {
+  background: #10B981 !important;
+  color: #ffffff !important;
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.toast-error {
+  background: #ef4444 !important;
+  color: white !important;
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   FORM ELEMENTS
+   ========================================== */
+
 /* Custom checkbox */
 input[type="checkbox"] {
-  accent-color: #2bee4b;
+  accent-color: #FF9933;
+  transition: transform 0.2s ease;
+}
+
+input[type="checkbox"]:hover {
+  transform: scale(1.1);
 }
 
 /* Number input without spinners */
@@ -186,14 +515,19 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
+
+/* ==========================================
+   TYPOGRAPHY & UTILITIES
+   ========================================== */
 
 /* Price tag styling */
 .price-tag {
   font-variant-numeric: tabular-nums;
 }
 
-/* Badge styles */
+/* Badge styles with animation */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -204,11 +538,16 @@ input[type="number"] {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-radius: 9999px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
 }
 
 .badge-primary {
-  background-color: rgba(43, 238, 75, 0.1);
-  color: #2bee4b;
+  background-color: rgba(255, 153, 51, 0.15);
+  color: #d97706;
 }
 
 .badge-success {
@@ -226,17 +565,10 @@ input[type="number"] {
   color: #ef4444;
 }
 
-/* Card hover effect */
-.card-hover {
-  transition: all 0.3s ease;
-}
+/* ==========================================
+   CONTAINER & LAYOUT
+   ========================================== */
 
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Container max widths */
 .container-app {
   max-width: 1280px;
   margin: 0 auto;
@@ -253,4 +585,34 @@ input[type="number"] {
   .container-app {
     padding: 0 2.5rem;
   }
+}
+
+/* ==========================================
+   REDUCED MOTION - Accessibility
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ==========================================
+   DARK MODE TRANSITIONS
+   ========================================== */
+
+.dark * {
+  transition: background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
