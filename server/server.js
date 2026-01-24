@@ -63,6 +63,16 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Root endpoint for Health Check
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'FreshCart API is running!',
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    });
+});
+
 // API documentation endpoint
 app.get('/api', (req, res) => {
     res.status(200).json({
