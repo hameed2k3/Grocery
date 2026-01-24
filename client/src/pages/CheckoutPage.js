@@ -15,7 +15,7 @@ const CheckoutPage = () => {
     const [selectedAddress, setSelectedAddress] = useState(
         user?.addresses?.find(a => a.isDefault)?._id || user?.addresses?.[0]?._id || null
     );
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+    const [paymentMethod] = useState('cod');
     const [notes, setNotes] = useState('');
     const [showNewAddress, setShowNewAddress] = useState(false);
     const [newAddress, setNewAddress] = useState({
