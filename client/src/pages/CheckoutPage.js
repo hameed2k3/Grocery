@@ -157,15 +157,63 @@ const CheckoutPage = () => {
                             </div>
                         )}
 
-                        <button
-                            onClick={() => setShowNewAddress(!showNewAddress)}
-                            className="mt-4 flex items-center gap-2 text-primary font-medium hover:underline"
-                        >
-                            <span className="material-symbols-outlined text-sm">
-                                {showNewAddress ? 'close' : 'add'}
-                            </span>
-                            {showNewAddress ? 'Cancel' : 'Add New Address'}
-                        </button>
+                        <div className="mt-4 flex flex-wrap items-center gap-4">
+                            <button
+                                onClick={() => setShowNewAddress(!showNewAddress)}
+                                className="flex items-center gap-2 text-primary font-medium hover:underline"
+                            >
+                                <span className="material-symbols-outlined text-sm">
+                                    {showNewAddress ? 'close' : 'add'}
+                                </span>
+                                {showNewAddress ? 'Cancel' : 'Add New Address'}
+                            </button>
+
+                            {showNewAddress && (
+                                <button
+                                    onClick={() => {
+                                        if (!navigator.geolocation) {
+                                            toast.error('Geolocation is not supported by your browser');
+                                            return;
+                                        }
+                                        const toastId = toast.loading('Fetching location...');
+                                        navigator.geolocation.getCurrentPosition(
+                                            async (position) => {
+                                                try {
+                                                    const { latitude, longitude } = position.coords;
+                                                    const response = await fetch(
+                                                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                                                    );
+                                                    const data = await response.json();
+                                                    if (data.address) {
+                                                        setNewAddress(prev => ({
+                                                            ...prev,
+                                                            city: data.address.city || data.address.town || data.address.village || '',
+                                                            state: data.address.state || '',
+                                                            zipCode: data.address.postcode || '',
+                                                            country: data.address.country || 'India',
+                                                            street: `${data.address.road || ''} ${data.address.house_number || ''}`.trim()
+                                                        }));
+                                                        toast.success('Location fetched successfully!', { id: toastId });
+                                                    } else {
+                                                        throw new Error('Address not found');
+                                                    }
+                                                } catch (error) {
+                                                    toast.error('Failed to fetch address details', { id: toastId });
+                                                }
+                                            },
+                                            (error) => {
+                                                console.error(error);
+                                                toast.error('Unable to retrieve your location', { id: toastId });
+                                            }
+                                        );
+                                    }}
+                                    className="flex items-center gap-2 text-gray-600 dark:text-gray-300 font-medium hover:text-primary transition-colors text-sm border border-dashed border-gray-300 dark:border-gray-600 px-3 py-1 rounded-full"
+                                >
+                                    <span className="material-symbols-outlined text-sm">my_location</span>
+                                    Use My Location
+                                </button>
+                            )}
+                        </div>
 
                         {showNewAddress && (
                             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
