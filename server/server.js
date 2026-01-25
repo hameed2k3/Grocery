@@ -23,6 +23,7 @@ require('./config/passport'); // Initialize passport strategy
 
 // Initialize express app
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Render/Vercel)
 
 // Connect to database
 connectDB();
