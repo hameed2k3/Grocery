@@ -34,6 +34,20 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
+        // Handle Network Errors
+        if (error.code === 'ERR_NETWORK') {
+            const toast = require('react-hot-toast').default;
+            toast.error('Network error. Please check your connection.');
+            return Promise.reject(error);
+        }
+
+        // Handle 500 Server Errors
+        if (error.response?.status >= 500) {
+            const toast = require('react-hot-toast').default;
+            toast.error('Server error. Please try again later.');
+            return Promise.reject(error);
+        }
+
         // Handle 401 - Token expired
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
