@@ -143,6 +143,7 @@ const server = app.listen(PORT, () => {
 📦 Environment: ${process.env.NODE_ENV || 'development'}
 🌐 Port: ${PORT}
 📡 API URL: http://localhost:${PORT}/api
+🔗 Callback URL: ${process.env.GOOGLE_CALLBACK_URL || 'NOT SET'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   `);
 });
