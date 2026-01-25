@@ -255,11 +255,11 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
     // Validate status transition
     const validTransitions = {
-        'pending': ['confirmed', 'cancelled'],
-        'confirmed': ['processing', 'cancelled'],
-        'processing': ['shipped', 'cancelled'],
-        'shipped': ['out-for-delivery', 'cancelled'],
-        'out-for-delivery': ['delivered'],
+        'pending': ['confirmed', 'processing', 'shipped', 'cancelled'], // Added 'shipped' and 'processing'
+        'confirmed': ['processing', 'shipped', 'cancelled'],
+        'processing': ['shipped', 'out-for-delivery', 'cancelled'],
+        'shipped': ['out-for-delivery', 'delivered', 'cancelled'],
+        'out-for-delivery': ['delivered', 'cancelled'],
         'delivered': [],
         'cancelled': [],
     };
