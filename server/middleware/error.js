@@ -65,12 +65,10 @@ const errorHandler = (err, req, res, next) => {
     }
 
     // Log error in development
-    if (process.env.NODE_ENV === 'development') {
-        console.error('Error:', {
-            message: err.message,
-            stack: err.stack,
-            statusCode,
-        });
+    // Always log errors for debugging purposes
+    console.error(`[Error] ${statusCode} - ${message}`);
+    if (statusCode === 500) {
+        console.error(err.stack);
     }
 
     res.status(statusCode).json({

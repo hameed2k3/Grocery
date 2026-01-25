@@ -40,8 +40,8 @@ const CheckoutPage = () => {
             ? newAddress
             : user?.addresses?.find(a => a._id === selectedAddress);
 
-        if (!address || !address.street || !address.city) {
-            toast.error('Please complete your delivery address');
+        if (!address || !address.street || !address.city || !address.state || !address.zipCode || !address.phone) {
+            toast.error('Please complete all address fields (Phone, Street, City, State, ZIP)');
             return;
         }
 
@@ -68,7 +68,13 @@ const CheckoutPage = () => {
                 state: { orderSuccess: true }
             });
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to place order');
+            const msg = error.response?.data?.message || 'Failed to place order';
+            if (error.response?.data?.errors) {
+                const details = error.response.data.errors.map(e => e.message).join(', ');
+                toast.error(`${msg}: ${details}`);
+            } else {
+                toast.error(msg);
+            }
         } finally {
             setLoading(false);
         }

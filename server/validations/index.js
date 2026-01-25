@@ -17,6 +17,9 @@ const validate = (req, res, next) => {
             message: err.msg,
         }));
 
+        // Log validation errors for debugging
+        console.warn(`[Validation Failed] ${req.originalUrl}:`, JSON.stringify(errorMessages));
+
         return res.status(400).json({
             success: false,
             message: 'Validation failed',
