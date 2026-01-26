@@ -54,6 +54,11 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
+// External Monitoring Health Check
+app.get("/health", (req, res) => {
+    res.status(200).send("Backend is alive 🚀");
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.status(200).json({
