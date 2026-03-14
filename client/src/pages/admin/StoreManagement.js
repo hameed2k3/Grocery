@@ -8,6 +8,8 @@ const StoreManagement = () => {
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingStore, setEditingStore] = useState(null);
 
     // New Store Form State
     const [formData, setFormData] = useState({
@@ -63,6 +65,51 @@ const StoreManagement = () => {
         } catch (error) {
             toast.dismiss();
             toast.error(error.response?.data?.message || 'Failed to create store');
+        }
+    };
+
+    const handleEditClick = (store) => {
+        setEditingStore(store);
+        setFormData({
+            name: store.name,
+            description: store.description || '',
+            type: store.type,
+            ownerEmail: store.owner?.email || '',
+            contact: store.contact || { phone: '', email: '' },
+            address: store.address || { street: '', city: '', state: '', zipCode: '' },
+            deliveryRules: store.deliveryRules || { freeDeliveryThreshold: 200, deliveryFee: 30 }
+        });
+        setShowEditModal(true);
+    };
+
+    const handleUpdateStore = async (e) => {
+        e.preventDefault();
+        try {
+            const loadingToast = toast.loading('Updating store...');
+            await storesAPI.update(editingStore._id, formData);
+            toast.dismiss(loadingToast);
+            toast.success('Store updated successfully!');
+            setShowEditModal(false);
+            fetchStores();
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response?.data?.message || 'Failed to update store');
+        }
+    };
+
+    const handleDeleteStore = async (storeId) => {
+        if (!window.confirm('Are you sure you want to deactivate this store? This action cannot be fully undone from the UI.')) {
+            return;
+        }
+        try {
+            const loadingToast = toast.loading('Deactivating store...');
+            await storesAPI.delete(storeId);
+            toast.dismiss(loadingToast);
+            toast.success('Store deactivated successfully!');
+            fetchStores();
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response?.data?.message || 'Failed to deactivate store');
         }
     };
 
@@ -127,8 +174,17 @@ const StoreManagement = () => {
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <button className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        View Details
+                                    <button 
+                                        onClick={() => handleEditClick(store)}
+                                        className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDeleteStore(store._id)}
+                                        className="flex-1 px-4 py-2 bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
+                                    >
+                                        Deactivate
                                     </button>
                                 </div>
                             </div>
@@ -136,16 +192,22 @@ const StoreManagement = () => {
                     </div>
                 )}
 
-                {/* Create Modal */}
-                {showCreateModal && (
+                {/* Create/Edit Modal */}
+                {(showCreateModal || showEditModal) && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                         <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <form onSubmit={handleCreateStore} className="p-6">
+                            <form onSubmit={showEditModal ? handleUpdateStore : handleCreateStore} className="p-6">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Create New Store</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                                        {showEditModal ? 'Edit Store' : 'Create New Store'}
+                                    </h2>
                                     <button
                                         type="button"
-                                        onClick={() => setShowCreateModal(false)}
+                                        onClick={() => {
+                                            setShowCreateModal(false);
+                                            setShowEditModal(false);
+                                            setEditingStore(null);
+                                        }}
                                         className="text-gray-500 hover:text-red-500"
                                     >
                                         <span className="material-symbols-outlined">close</span>
@@ -161,12 +223,12 @@ const StoreManagement = () => {
                                                 required
                                                 type="text"
                                                 placeholder="Store Name"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.name}
                                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             />
                                             <select
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.type}
                                                 onChange={e => setFormData({ ...formData, type: e.target.value })}
                                             >
@@ -176,7 +238,7 @@ const StoreManagement = () => {
                                         </div>
                                         <textarea
                                             placeholder="Description"
-                                            className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                            className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         />
@@ -190,15 +252,16 @@ const StoreManagement = () => {
                                                 required
                                                 type="email"
                                                 placeholder="Owner ID (Email)"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                                                 value={formData.ownerEmail}
                                                 onChange={e => setFormData({ ...formData, ownerEmail: e.target.value })}
+                                                disabled={showEditModal} // Cannot easily change owner email after creation due to user linking
                                             />
                                             <input
                                                 required
                                                 type="text"
                                                 placeholder="Store Contact Phone"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.contact.phone}
                                                 onChange={e => setFormData({ ...formData, contact: { ...formData.contact, phone: e.target.value } })}
                                             />
@@ -212,7 +275,7 @@ const StoreManagement = () => {
                                             required
                                             type="text"
                                             placeholder="Street Address"
-                                            className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 mb-2"
+                                            className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 mb-2 outline-none focus:ring-2 focus:ring-primary"
                                             value={formData.address.street}
                                             onChange={e => setFormData({ ...formData, address: { ...formData.address, street: e.target.value } })}
                                         />
@@ -221,7 +284,7 @@ const StoreManagement = () => {
                                                 required
                                                 type="text"
                                                 placeholder="City"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.address.city}
                                                 onChange={e => setFormData({ ...formData, address: { ...formData.address, city: e.target.value } })}
                                             />
@@ -229,7 +292,7 @@ const StoreManagement = () => {
                                                 required
                                                 type="text"
                                                 placeholder="State"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.address.state}
                                                 onChange={e => setFormData({ ...formData, address: { ...formData.address, state: e.target.value } })}
                                             />
@@ -237,7 +300,7 @@ const StoreManagement = () => {
                                                 required
                                                 type="text"
                                                 placeholder="ZIP Code"
-                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                className="rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                 value={formData.address.zipCode}
                                                 onChange={e => setFormData({ ...formData, address: { ...formData.address, zipCode: e.target.value } })}
                                             />
@@ -252,7 +315,7 @@ const StoreManagement = () => {
                                                 <label className="text-xs text-gray-500 mb-1 block">Free Delivery Above (₹)</label>
                                                 <input
                                                     type="number"
-                                                    className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                    className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                     value={formData.deliveryRules.freeDeliveryThreshold}
                                                     onChange={e => setFormData({ ...formData, deliveryRules: { ...formData.deliveryRules, freeDeliveryThreshold: e.target.value } })}
                                                 />
@@ -261,7 +324,7 @@ const StoreManagement = () => {
                                                 <label className="text-xs text-gray-500 mb-1 block">Std Delivery Fee (₹)</label>
                                                 <input
                                                     type="number"
-                                                    className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3"
+                                                    className="w-full rounded-lg border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-primary"
                                                     value={formData.deliveryRules.deliveryFee}
                                                     onChange={e => setFormData({ ...formData, deliveryRules: { ...formData.deliveryRules, deliveryFee: e.target.value } })}
                                                 />
@@ -273,8 +336,12 @@ const StoreManagement = () => {
                                 <div className="mt-8 flex justify-end gap-4">
                                     <button
                                         type="button"
-                                        onClick={() => setShowCreateModal(false)}
-                                        className="px-6 py-3 font-bold text-gray-500 hover:bg-gray-100 rounded-xl"
+                                        onClick={() => {
+                                            setShowCreateModal(false);
+                                            setShowEditModal(false);
+                                            setEditingStore(null);
+                                        }}
+                                        className="px-6 py-3 font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                                     >
                                         Cancel
                                     </button>
@@ -282,7 +349,7 @@ const StoreManagement = () => {
                                         type="submit"
                                         className="px-6 py-3 bg-primary text-gray-900 font-bold rounded-xl hover:shadow-lg hover:bg-primary/90 transition-all"
                                     >
-                                        Create Store
+                                        {showEditModal ? 'Update Store' : 'Create Store'}
                                     </button>
                                 </div>
                             </form>
