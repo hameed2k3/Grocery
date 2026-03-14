@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { productsAPI } from '../../services/api';
+import { productsAPI, vendorAPI } from '../../services/api'; // Added vendorAPI
 import LoadingSpinner from '../../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,76 @@ const AdminProducts = () => {
         isFeatured: false,
         isBestSeller: false,
     });
+
+    // Bulk Upload State
+    const [file, setFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [zipFile, setZipFile] = useState(null);
+    const [uploadingImages, setUploadingImages] = useState(false);
+    const [showUploads, setShowUploads] = useState(false); // Toggle for upload section
+
+    const handleFileChange = (e) => setFile(e.target.files[0]);
+    const handleZipChange = (e) => setZipFile(e.target.files[0]);
+
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            setUploading(true);
+            const loadingToast = toast.loading('Uploading inventory...');
+            const response = await vendorAPI.uploadInventory(formData);
+            toast.dismiss(loadingToast);
+            toast.success(response.data.message);
+
+            const { updated, failed, errors } = response.data.data;
+            if (errors.length > 0) {
+                toast.error(`Updated ${updated} items, but ${failed} failed.`);
+            } else {
+                toast.success(`Successfully updated ${updated} products!`);
+            }
+            setFile(null);
+            fetchProducts();
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response?.data?.message || 'Upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleImageUpload = async (e) => {
+        e.preventDefault();
+        if (!zipFile) return;
+
+        const formData = new FormData();
+        formData.append('file', zipFile);
+
+        try {
+            setUploadingImages(true);
+            const loadingToast = toast.loading('Uploading images...');
+            const response = await vendorAPI.uploadImages(formData);
+            toast.dismiss(loadingToast);
+            toast.success(response.data.message);
+
+            const { updated, failed, errors } = response.data.data;
+            if (errors.length > 0) {
+                toast.error(`Updated ${updated} images, but ${failed} failed.`);
+            } else {
+                toast.success(`Successfully updated ${updated} product images!`);
+            }
+            setZipFile(null);
+            fetchProducts();
+        } catch (error) {
+            toast.dismiss();
+            toast.error(error.response?.data?.message || 'Image upload failed');
+        } finally {
+            setUploadingImages(false);
+        }
+    };
 
     const fetchProducts = useCallback(async (page = 1) => {
         try {
@@ -129,18 +199,94 @@ const AdminProducts = () => {
                         </Link>
                         <h1 className="text-xl font-bold text-gray-900 dark:text-white">Products</h1>
                     </div>
-                    <button
-                        onClick={openCreateModal}
-                        className="bg-primary text-gray-900 font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all"
-                    >
-                        <span className="material-symbols-outlined">add</span>
-                        Add Product
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setShowUploads(!showUploads)}
+                            className={`font-bold py-2 px-4 rounded-lg flex items-center gap-2 border transition-all ${showUploads ? 'bg-gray-100 text-gray-900 border-gray-300' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                        >
+                            <span className="material-symbols-outlined">upload_file</span>
+                            Bulk Tools
+                        </button>
+                        <button
+                            onClick={openCreateModal}
+                            className="bg-primary text-gray-900 font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all"
+                        >
+                            <span className="material-symbols-outlined">add</span>
+                            Add Product
+                        </button>
+                    </div>
                 </div>
             </header>
 
             {/* Main Content */}
             <main className="max-w-[1400px] mx-auto px-6 py-8">
+
+                {/* Bulk Upload Tools */}
+                {showUploads && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 animate-fadeIn">
+                        {/* Inventory Excel Upload */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-green-100 p-3 rounded-lg text-green-600">
+                                    <span className="material-symbols-outlined text-3xl">table_view</span>
+                                </div>
+                                <div className="flex-1">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Update Stock & Price</h2>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Upload Excel/CSV. Columns: <code>SKU</code>, <code>Stock</code>, <code>Price</code>.
+                                    </p>
+
+                                    <form onSubmit={handleUpload} className="flex gap-2 items-center flex-col sm:flex-row">
+                                        <input
+                                            type="file"
+                                            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                            onChange={handleFileChange}
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={!file || uploading}
+                                            className="w-full sm:w-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg disabled:opacity-50 text-sm whitespace-nowrap transition-colors"
+                                        >
+                                            {uploading ? '...' : 'Upload Data'}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Image Zip Upload */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
+                                    <span className="material-symbols-outlined text-3xl">folder_zip</span>
+                                </div>
+                                <div className="flex-1">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Bulk Image Upload</h2>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Upload <strong>ZIP file</strong> containing images named by SKU.
+                                    </p>
+
+                                    <form onSubmit={handleImageUpload} className="flex gap-2 items-center flex-col sm:flex-row">
+                                        <input
+                                            type="file"
+                                            accept=".zip, application/zip, application/x-zip-compressed"
+                                            onChange={handleZipChange}
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={!zipFile || uploadingImages}
+                                            className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg disabled:opacity-50 text-sm whitespace-nowrap transition-colors"
+                                        >
+                                            {uploadingImages ? '...' : 'Upload Images'}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {/* Search & Filters */}
                 <form onSubmit={handleSearch} className="flex gap-4 mb-6">
                     <div className="flex-1 relative">

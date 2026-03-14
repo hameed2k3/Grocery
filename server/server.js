@@ -15,6 +15,9 @@ const {
     productRoutes,
     cartRoutes,
     orderRoutes,
+    vendorRoutes,
+    storeRoutes,
+    notificationRoutes,
 } = require('./routes');
 
 // Import middleware
@@ -53,6 +56,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/vendor', vendorRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // External Monitoring Health Check
 app.get("/health", (req, res) => {

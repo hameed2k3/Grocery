@@ -48,11 +48,21 @@ const ProductsPage = () => {
                 bestSeller: searchParams.get('bestSeller') || undefined,
             };
 
+            console.log('=== PRODUCTS PAGE FETCH ===');
+            console.log('Search params from URL:', Object.fromEntries(searchParams));
+            console.log('API params being sent:', params);
+
             const response = await productsAPI.getAll(params);
+
+            console.log('API Response:', response.data);
+            console.log('Products received:', response.data.data.products.length);
+            console.log('Pagination:', response.data.data.pagination);
+
             setProducts(response.data.data.products);
             setPagination(response.data.data.pagination);
         } catch (error) {
             console.error('Failed to fetch products:', error);
+            console.error('Error details:', error.response?.data);
         } finally {
             setLoading(false);
         }

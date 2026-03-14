@@ -134,20 +134,25 @@ const productValidation = {
             .isInt({ min: 1, max: 100 })
             .withMessage('Limit must be between 1 and 100'),
         query('category')
-            .optional()
-            .isIn([
-                'fruits-vegetables',
-                'dairy-eggs',
-                'bakery',
-                'meat-seafood',
-                'pantry',
-                'beverages',
-                'frozen',
-                'snacks',
-                'household',
-                'personal-care',
-            ])
-            .withMessage('Invalid category'),
+            .optional({ checkFalsy: true })
+            .custom((value) => {
+                const validCategories = [
+                    'fruits-vegetables',
+                    'dairy-eggs',
+                    'bakery',
+                    'meat-seafood',
+                    'pantry',
+                    'beverages',
+                    'frozen',
+                    'snacks',
+                    'household',
+                    'personal-care',
+                ];
+                // Allow empty string or valid category
+                if (!value || value === '') return true;
+                if (validCategories.includes(value)) return true;
+                throw new Error('Invalid category');
+            }),
         query('minPrice')
             .optional()
             .isFloat({ min: 0 })

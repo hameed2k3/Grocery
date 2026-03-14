@@ -65,6 +65,7 @@ const AdminDashboard = () => {
     ];
 
     const quickActions = [
+        { title: 'Manage Stores', icon: 'store', path: '/admin/stores', color: 'bg-orange-50 text-orange-600' }, // New
         { title: 'Manage Products', icon: 'inventory_2', path: '/admin/products', color: 'bg-blue-50 text-blue-600' },
         { title: 'View Orders', icon: 'receipt_long', path: '/admin/orders', color: 'bg-green-50 text-green-600' },
         { title: 'Low Stock Alerts', icon: 'warning', path: '/admin/products?filter=low-stock', color: 'bg-yellow-50 text-yellow-600' },

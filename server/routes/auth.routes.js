@@ -11,6 +11,9 @@ const {
     addAddress,
     updateAddress,
     deleteAddress,
+    getWishlist,
+    addToWishlist,
+    removeFromWishlist,
 } = require('../controllers/auth.controller');
 const { protect } = require('../middleware');
 const { validate, authValidation } = require('../validations');
@@ -90,6 +93,27 @@ router.put('/addresses/:addressId', protect, updateAddress);
  * @access  Private
  */
 router.delete('/addresses/:addressId', protect, deleteAddress);
+
+/**
+ * @route   GET /api/auth/wishlist
+ * @desc    Get user wishlist
+ * @access  Private
+ */
+router.get('/wishlist', protect, getWishlist);
+
+/**
+ * @route   POST /api/auth/wishlist/:productId
+ * @desc    Add to wishlist
+ * @access  Private
+ */
+router.post('/wishlist/:productId', protect, addToWishlist);
+
+/**
+ * @route   DELETE /api/auth/wishlist/:productId
+ * @desc    Remove from wishlist
+ * @access  Private
+ */
+router.delete('/wishlist/:productId', protect, removeFromWishlist);
 
 /**
  * @route   GET /api/auth/google

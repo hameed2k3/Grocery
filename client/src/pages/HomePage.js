@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const HomePage = () => {
+    const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchProducts();
@@ -25,6 +27,13 @@ const HomePage = () => {
             console.error('Failed to fetch products:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
         }
     };
 
@@ -86,6 +95,61 @@ const HomePage = () => {
                 </div>
             </section>
 
+            {/* Search Section */}
+            <section className="px-6 lg:px-10 py-8">
+                <div className="max-w-[1200px] mx-auto">
+                    <div className="bg-gradient-to-r from-primary/10 to-green-100 dark:from-primary/5 dark:to-green-900/20 rounded-2xl p-8 border border-primary/20">
+                        <div className="text-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                What are you looking for?
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-400">
+                                Search from thousands of fresh products
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
+                            <div className="flex gap-2">
+                                <div className="flex-1 flex items-center bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus-within:border-primary transition-colors overflow-hidden shadow-sm">
+                                    <span className="material-symbols-outlined text-gray-400 ml-4">search</span>
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search for products, categories, or brands..."
+                                        className="flex-1 px-4 py-4 bg-transparent outline-none text-gray-900 dark:text-white placeholder-gray-400"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="px-8 py-4 bg-primary hover:bg-primary/90 text-gray-900 font-bold rounded-xl transition-all hover:shadow-lg flex items-center gap-2"
+                                >
+                                    <span className="hidden sm:inline">Search</span>
+                                    <span className="material-symbols-outlined">arrow_forward</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        {/* Quick Category Filters */}
+                        <div className="flex flex-wrap justify-center gap-2 mt-6">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 self-center mr-2">Quick search:</span>
+                            {['Organic', 'Fresh Fruits', 'Dairy', 'Bakery', 'Beverages'].map((term) => (
+                                <button
+                                    key={term}
+                                    onClick={() => {
+                                        setSearchQuery(term);
+                                        navigate(`/products?search=${encodeURIComponent(term)}`);
+                                    }}
+                                    className="px-4 py-1.5 bg-white dark:bg-gray-800 hover:bg-primary hover:text-gray-900 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all"
+                                >
+                                    {term}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Why Choose Us */}
             <section className="bg-yellow-50 dark:bg-gray-800/20 py-12 px-6 lg:px-10">
                 <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -130,7 +194,7 @@ const HomePage = () => {
                         {categories.map((category) => (
                             <Link
                                 key={category.slug}
-                                to={`/category/${category.slug}`}
+                                to={`/products?category=${category.slug}`}
                                 className="group cursor-pointer"
                             >
                                 <div

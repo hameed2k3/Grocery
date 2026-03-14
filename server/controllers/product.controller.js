@@ -7,6 +7,9 @@ const { asyncHandler, ApiError } = require('../middleware');
  * @access  Public
  */
 const getProducts = asyncHandler(async (req, res) => {
+    console.log('=== GET PRODUCTS REQUEST ===');
+    console.log('Query params:', req.query);
+
     const {
         page = 1,
         limit = 12,
@@ -22,6 +25,7 @@ const getProducts = asyncHandler(async (req, res) => {
         sortOrder = 'desc',
         featured,
         bestSeller,
+        store, // Add store filter
     } = req.query;
 
     // Build filter object
@@ -29,6 +33,12 @@ const getProducts = asyncHandler(async (req, res) => {
 
     if (category) {
         filter.category = category;
+        console.log('Category filter applied:', category);
+    }
+
+    if (store) {
+        filter.store = store;
+        console.log('Store filter applied:', store);
     }
 
     if (search) {
@@ -37,12 +47,14 @@ const getProducts = asyncHandler(async (req, res) => {
             { description: { $regex: search, $options: 'i' } },
             { tags: { $in: [new RegExp(search, 'i')] } },
         ];
+        console.log('Search filter applied:', search);
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
         filter.price = {};
         if (minPrice !== undefined) filter.price.$gte = parseFloat(minPrice);
         if (maxPrice !== undefined) filter.price.$lte = parseFloat(maxPrice);
+        console.log('Price filter applied:', filter.price);
     }
 
     if (organic === 'true') filter['attributes.organic'] = true;
@@ -51,6 +63,8 @@ const getProducts = asyncHandler(async (req, res) => {
     if (inStock === 'true') filter.stock = { $gt: 0 };
     if (featured === 'true') filter.isFeatured = true;
     if (bestSeller === 'true') filter.isBestSeller = true;
+
+    console.log('Final filter object:', JSON.stringify(filter, null, 2));
 
     // Build sort object
     const sort = {};
@@ -69,6 +83,8 @@ const getProducts = asyncHandler(async (req, res) => {
             .lean(),
         Product.countDocuments(filter),
     ]);
+
+    console.log(`Found ${products.length} products out of ${total} total`);
 
     // Calculate discounted prices
     const productsWithDiscount = products.map(product => ({
@@ -403,6 +419,79 @@ const updateStock = asyncHandler(async (req, res) => {
     });
 });
 
+const Order = require('../models/Order'); // Import Order model
+
+/**
+ * @desc    Get product sales statistics (frequently ordered)
+ * @route   GET /api/products/sales-stats
+ * @access  Private/Admin
+ */
+const getProductSalesStats = asyncHandler(async (req, res) => {
+    const stats = await Order.aggregate([
+        { $match: { orderStatus: { $ne: 'cancelled' } } },
+        { $unwind: '$items' },
+        {
+            $group: {
+                _id: '$items.product',
+                name: { $first: '$items.name' },
+                sku: { $first: '$items.sku' },
+                totalQuantity: { $sum: '$items.quantity' },
+                totalRevenue: { $sum: { $multiply: ['$items.quantity', '$items.price'] } },
+                orderCount: { $sum: 1 },
+                lastOrdered: { $max: '$createdAt' },
+            }
+        },
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 50 }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        data: {
+            stats
+        },
+    });
+});
+
+/**
+ * @desc    Create new review
+ * @route   POST /api/products/:id/reviews
+ * @access  Private
+ */
+const addProductReview = asyncHandler(async (req, res) => {
+    const { rating, comment } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        throw new ApiError('Product not found', 404);
+    }
+
+    const alreadyReviewed = product.ratings.reviews.find(
+        (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+        throw new ApiError('Product already reviewed', 400);
+    }
+
+    const review = {
+        name: req.user.name,
+        rating: Number(rating),
+        comment,
+        user: req.user._id,
+    };
+
+    product.ratings.reviews.push(review);
+
+    product.ratings.count = product.ratings.reviews.length;
+    product.ratings.average =
+        product.ratings.reviews.reduce((acc, item) => item.rating + acc, 0) /
+        product.ratings.reviews.length;
+
+    await product.save();
+    res.status(201).json({ success: true, message: 'Review added' });
+});
+
 module.exports = {
     getProducts,
     getProductById,
@@ -414,5 +503,7 @@ module.exports = {
     deleteProduct,
     permanentDeleteProduct,
     getProductStats,
+    getProductSalesStats,
     updateStock,
+    addProductReview,
 };

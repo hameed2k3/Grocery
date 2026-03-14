@@ -137,12 +137,50 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const getWishlist = async () => {
+        try {
+            const response = await authAPI.getWishlist();
+            return { success: true, wishlist: response.data.data.wishlist };
+        } catch (err) {
+            return { success: false, error: err.response?.data?.message };
+        }
+    };
+
+    const addToWishlist = async (productId) => {
+        try {
+            const response = await authAPI.addToWishlist(productId);
+            // Optimistic update could happen here given the API returns the updated list of IDs, 
+            // but for full product data we might reload or just trust the ID list
+            setUser(prev => ({
+                ...prev,
+                wishlist: response.data.data.wishlist,
+            }));
+            return { success: true };
+        } catch (err) {
+            return { success: false, error: err.response?.data?.message };
+        }
+    };
+
+    const removeFromWishlist = async (productId) => {
+        try {
+            const response = await authAPI.removeFromWishlist(productId);
+            setUser(prev => ({
+                ...prev,
+                wishlist: response.data.data.wishlist,
+            }));
+            return { success: true };
+        } catch (err) {
+            return { success: false, error: err.response?.data?.message };
+        }
+    };
+
     const value = {
         user,
         loading,
         error,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'admin',
+        isVendor: user?.role === 'vendor_admin', // Added isVendor
         login,
         register,
         logout,
@@ -150,6 +188,9 @@ export const AuthProvider = ({ children }) => {
         addAddress,
         updateAddress,
         deleteAddress,
+        getWishlist,
+        addToWishlist,
+        removeFromWishlist,
         checkAuth,
     };
 

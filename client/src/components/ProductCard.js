@@ -1,14 +1,39 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
     const { addToCart, loading } = useCart();
+    const { user, addToWishlist, removeFromWishlist } = useAuth();
+    const navigate = useNavigate();
+
+    const isWishlisted = user?.wishlist?.includes(product._id);
 
     const handleAddToCart = async (e) => {
         e.preventDefault();
         e.stopPropagation();
         await addToCart(product._id, 1);
+    };
+
+    const handleWishlistToggle = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user) {
+            toast.error('Please login to use wishlist');
+            // navigate('/login'); // Optional
+            return;
+        }
+
+        if (isWishlisted) {
+            await removeFromWishlist(product._id);
+            toast.success('Removed from wishlist');
+        } else {
+            await addToWishlist(product._id);
+            toast.success('Added to wishlist');
+        }
     };
 
     const discountedPrice = product.discount?.percentage > 0
@@ -18,9 +43,8 @@ const ProductCard = ({ product }) => {
     const primaryImage = product.images?.[0]?.url || 'https://via.placeholder.com/300x300?text=No+Image';
 
     return (
-        <Link
-            to={`/products/${product._id}`}
-            className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-primary transition-all duration-300 hover:shadow-xl"
+        <div
+            className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-primary transition-all duration-300"
         >
             {/* Product Image */}
             <div className="relative aspect-square overflow-hidden bg-gray-50 dark:bg-gray-900">
@@ -51,10 +75,15 @@ const ProductCard = ({ product }) => {
 
                 {/* Favorite Button */}
                 <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    className="absolute top-3 right-3 text-gray-600 dark:text-white bg-white/80 dark:bg-black/30 backdrop-blur rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={handleWishlistToggle}
+                    className="absolute top-3 right-3 text-gray-600 dark:text-white bg-white/80 dark:bg-black/30 backdrop-blur rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary hover:text-white"
                 >
-                    <span className="material-symbols-outlined text-sm">favorite</span>
+                    <span
+                        className={`material-symbols-outlined text-sm ${isWishlisted ? 'text-red-500' : ''}`}
+                        style={isWishlisted ? { fontVariationSettings: "'FILL' 1" } : {}}
+                    >
+                        favorite
+                    </span>
                 </button>
             </div>
 
@@ -96,7 +125,7 @@ const ProductCard = ({ product }) => {
                     <span>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
                 </button>
             </div>
-        </Link>
+        </div>
     );
 };
 

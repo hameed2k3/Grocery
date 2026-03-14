@@ -127,6 +127,19 @@ const productSchema = new mongoose.Schema({
             type: Number,
             default: 0,
         },
+        reviews: [
+            {
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'User',
+                    required: true
+                },
+                name: { type: String, required: true },
+                rating: { type: Number, required: true, min: 1, max: 5 },
+                comment: { type: String, required: true },
+                createdAt: { type: Date, default: Date.now }
+            }
+        ]
     },
     isFeatured: {
         type: Boolean,
@@ -140,6 +153,13 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    store: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
+        // Optional for now to support legacy data (admin's global store),
+        // but eventually should be required for vendor-specific items.
+        default: null,
+    },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
@@ -151,6 +171,7 @@ productSchema.index({ name: 'text', description: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ 'attributes.organic': 1 });
+productSchema.index({ store: 1 }); // Index for fast retrieval of a store's products
 
 /**
  * Virtual: Calculate discounted price

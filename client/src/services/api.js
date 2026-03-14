@@ -92,6 +92,9 @@ export const authAPI = {
     addAddress: (data) => api.post('/auth/addresses', data),
     updateAddress: (addressId, data) => api.put(`/auth/addresses/${addressId}`, data),
     deleteAddress: (addressId) => api.delete(`/auth/addresses/${addressId}`),
+    getWishlist: () => api.get('/auth/wishlist'),
+    addToWishlist: (productId) => api.post(`/auth/wishlist/${productId}`),
+    removeFromWishlist: (productId) => api.delete(`/auth/wishlist/${productId}`),
 };
 
 // Products API calls
@@ -108,6 +111,8 @@ export const productsAPI = {
     delete: (id) => api.delete(`/products/${id}`),
     updateStock: (id, data) => api.patch(`/products/${id}/stock`, data),
     getStats: () => api.get('/products/stats'),
+    getSalesStats: () => api.get('/products/sales-stats'), // New
+    addReview: (id, data) => api.post(`/products/${id}/reviews`, data),
 };
 
 // Cart API calls
@@ -133,6 +138,36 @@ export const ordersAPI = {
     getAll: (params) => api.get('/orders/all', { params }),
     updateStatus: (id, status, note) => api.put(`/orders/${id}/status`, { status, note }),
     getStats: () => api.get('/orders/stats'),
+};
+
+// Stores API calls
+export const storesAPI = {
+    getAll: (params) => api.get('/stores', { params }),
+    getById: (id) => api.get(`/stores/${id}`),
+    create: (data) => api.post('/stores', data),
+    update: (id, data) => api.put(`/stores/${id}`, data),
+    delete: (id) => api.delete(`/stores/${id}`),
+};
+
+// Vendor API calls
+export const vendorAPI = {
+    getStats: () => api.get('/vendor/stats'),
+    getProducts: (params) => api.get('/vendor/products', { params }),
+    updateStock: (id, stock) => api.patch(`/vendor/products/${id}/stock`, { stock }),
+    uploadInventory: (formData) => api.post('/vendor/inventory/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    uploadImages: (formData) => api.post('/vendor/inventory/upload-images', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    getOrders: (params) => api.get('/vendor/orders', { params }),
+};
+
+// Notifications API calls
+export const notificationAPI = {
+    getAll: () => api.get('/notifications'),
+    markAsRead: (id) => api.put(`/notifications/${id}/read`),
+    markAllAsRead: () => api.put('/notifications/read-all'),
 };
 
 export default api;

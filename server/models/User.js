@@ -38,6 +38,8 @@ const addressSchema = new mongoose.Schema({
         type: String,
         default: 'USA',
     },
+    latitude: { type: Number },
+    longitude: { type: Number },
     isDefault: {
         type: Boolean,
         default: false,
@@ -70,8 +72,13 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'vendor_admin'], // Added vendor_admin
         default: 'user',
+    },
+    storeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
+        default: null, // Only for vendor_admins
     },
     avatar: {
         type: String,
@@ -90,6 +97,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         select: false,
     },
+    wishlist: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+    }],
     memberSince: {
         type: Date,
         default: Date.now,

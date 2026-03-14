@@ -166,7 +166,7 @@ const LoginPage = () => {
                             type="button"
                             className="w-full flex items-center justify-center gap-3 py-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                             onClick={() => {
-                                let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+                                let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
                                 if (!apiUrl.endsWith('/api')) apiUrl += '/api';
                                 window.location.href = `${apiUrl}/auth/google`;
                             }}

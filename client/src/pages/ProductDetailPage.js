@@ -2,16 +2,38 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productsAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const { addToCart } = useCart();
+    const { user, addToWishlist, removeFromWishlist } = useAuth();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
+
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState('');
+    const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+    const isWishlisted = user?.wishlist?.includes(product?._id);
+
+    const handleWishlistToggle = async () => {
+        if (!user) {
+            toast.error('Please login to use wishlist');
+            return;
+        }
+        if (isWishlisted) {
+            await removeFromWishlist(product._id);
+            toast.success('Removed from wishlist');
+        } else {
+            await addToWishlist(product._id);
+            toast.success('Added to wishlist');
+        }
+    };
 
     const fetchProduct = useCallback(async () => {
         try {
@@ -25,6 +47,8 @@ const ProductDetailPage = () => {
             setLoading(false);
         }
     }, [id]);
+
+
 
     useEffect(() => {
         fetchProduct();
@@ -46,6 +70,31 @@ const ProductDetailPage = () => {
     const decrementQuantity = () => {
         if (quantity > 1) {
             setQuantity(quantity - 1);
+        }
+    };
+
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        if (!reviewComment.trim()) {
+            toast.error('Please enter a comment');
+            return;
+        }
+
+        try {
+            setReviewSubmitting(true);
+            await productsAPI.addReview(id, {
+                rating: reviewRating,
+                comment: reviewComment
+            });
+            toast.success('Review submitted successfully!');
+            setReviewComment('');
+            setReviewRating(5);
+            fetchProduct(); // Refresh product data to show new review
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response?.data?.message || 'Failed to submit review');
+        } finally {
+            setReviewSubmitting(false);
         }
     };
 
@@ -135,10 +184,24 @@ const ProductDetailPage = () => {
                         )}
                     </div>
 
-                    {/* Title & Category */}
-                    <div>
-                        <p className="text-sm text-gray-500 uppercase tracking-wider">{product.category.replace('-', ' & ')}</p>
-                        <h1 className="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mt-2">{product.name}</h1>
+                    {/* Title & Category - With Wishlist Button */}
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-sm text-gray-500 uppercase tracking-wider">{product.category.replace('-', ' & ')}</p>
+                            <h1 className="text-3xl lg:text-4xl font-black text-gray-900 dark:text-white mt-2">{product.name}</h1>
+                        </div>
+                        <button
+                            onClick={handleWishlistToggle}
+                            className={`p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${isWishlisted ? 'text-red-500' : 'text-gray-400'}`}
+                            title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+                        >
+                            <span
+                                className="material-symbols-outlined text-3xl"
+                                style={isWishlisted ? { fontVariationSettings: "'FILL' 1" } : {}}
+                            >
+                                favorite
+                            </span>
+                        </button>
                     </div>
 
                     {/* Rating */}
@@ -278,6 +341,95 @@ const ProductDetailPage = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* Reviews Section */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+                        <h3 className="font-bold text-xl text-gray-900 dark:text-white mb-6">Customer Reviews</h3>
+
+                        {/* Review Form */}
+                        {user ? (
+                            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl mb-8">
+                                <h4 className="font-bold text-gray-900 dark:text-white mb-4">Write a Review</h4>
+                                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rating</label>
+                                        <div className="flex gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                    type="button"
+                                                    key={star}
+                                                    onClick={() => setReviewRating(star)}
+                                                    className={`text-2xl transition-colors ${reviewRating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                >
+                                                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comment</label>
+                                        <textarea
+                                            className="w-full rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 h-24"
+                                            placeholder="Share your thoughts about this product..."
+                                            value={reviewComment}
+                                            onChange={(e) => setReviewComment(e.target.value)}
+                                            required
+                                        ></textarea>
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={reviewSubmitting}
+                                        className="bg-primary text-gray-900 font-bold py-2 px-6 rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                                    >
+                                        {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
+                                    </button>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-8 text-center">
+                                <p className="text-blue-800 dark:text-blue-200">
+                                    Please <Link to="/login" className="font-bold underline">login</Link> to write a review.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Reviews List */}
+                        <div className="space-y-6">
+                            {product.ratings?.reviews?.length > 0 ? (
+                                product.ratings.reviews.map((review, index) => (
+                                    <div key={index} className="border-b border-gray-100 dark:border-gray-800 pb-6 last:border-0">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">
+                                                    {review.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="font-bold text-gray-900 dark:text-white">{review.name}</span>
+                                            </div>
+                                            <span className="text-xs text-gray-500">
+                                                {new Date(review.createdAt).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-1 mb-2">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span
+                                                    key={i}
+                                                    className={`material-symbols-outlined text-sm ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                                    style={{ fontVariationSettings: "'FILL' 1" }}
+                                                >
+                                                    star
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
+                                            {review.comment}
+                                        </p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 text-center py-8">No reviews yet. Be the first to review this product!</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

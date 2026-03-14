@@ -11,10 +11,26 @@ const {
     deleteProduct,
     permanentDeleteProduct,
     getProductStats,
+    getProductSalesStats, // New
     updateStock,
+    addProductReview,
 } = require('../controllers/product.controller');
 const { protect, authorize } = require('../middleware');
 const { validate, productValidation } = require('../validations');
+
+/**
+ * @route   GET /api/products/sales-stats
+ * @desc    Get frequently ordered products (Admin)
+ * @access  Private/Admin
+ */
+router.get('/sales-stats', protect, authorize('admin'), getProductSalesStats);
+
+/**
+ * @route   POST /api/products/:id/reviews
+ * @desc    Create new review
+ * @access  Private
+ */
+router.post('/:id/reviews', protect, addProductReview);
 
 /**
  * @route   GET /api/products

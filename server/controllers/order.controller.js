@@ -1,6 +1,8 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
 const { asyncHandler, ApiError } = require('../middleware');
 
 /**
@@ -14,7 +16,7 @@ const createOrder = asyncHandler(async (req, res) => {
     // Get user's cart
     const cart = await Cart.findOne({ user: req.user.id }).populate({
         path: 'items.product',
-        select: 'name sku price stock discount images isActive',
+        select: 'name sku price stock discount images isActive store',
     });
 
     if (!cart || cart.items.length === 0) {
@@ -48,6 +50,7 @@ const createOrder = asyncHandler(async (req, res) => {
             price: currentPrice,
             quantity: item.quantity,
             image: product.images?.[0]?.url || '',
+            store: product.store // Add store reference
         });
 
         subtotal += currentPrice * item.quantity;
@@ -97,6 +100,28 @@ const createOrder = asyncHandler(async (req, res) => {
         await Product.findByIdAndUpdate(item.product, {
             $inc: { stock: -item.quantity },
         });
+    }
+
+    // Create Notifications for Vendors
+    // 1. Identify unique stores
+    const uniqueStoreIds = [...new Set(orderItems.map(item => item.store?.toString()).filter(Boolean))];
+
+    // 2. Find vendors for these store IDs
+    if (uniqueStoreIds.length > 0) {
+        const vendors = await User.find({ storeId: { $in: uniqueStoreIds }, role: 'vendor_admin' });
+
+        // 3. Create notifications
+        const notifications = vendors.map(vendor => ({
+            recipient: vendor._id,
+            type: 'new_order',
+            title: 'New Order Received',
+            message: `You have a new order #${orderNumber}`,
+            data: { orderId: order._id }
+        }));
+
+        if (notifications.length > 0) {
+            await Notification.insertMany(notifications);
+        }
     }
 
     // Clear the cart

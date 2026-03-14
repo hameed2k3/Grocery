@@ -30,6 +30,11 @@ const orderItemSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    store: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
+        required: true,
+    },
 }, { _id: true });
 
 const orderSchema = new mongoose.Schema({
@@ -52,6 +57,8 @@ const orderSchema = new mongoose.Schema({
         state: { type: String, required: true },
         zipCode: { type: String, required: true },
         country: { type: String, default: 'USA' },
+        latitude: { type: Number },
+        longitude: { type: Number },
     },
     paymentMethod: {
         type: String,

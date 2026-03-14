@@ -361,6 +361,68 @@ const deleteAddress = asyncHandler(async (req, res) => {
     });
 });
 
+/**
+ * @desc    Get user wishlist
+ * @route   GET /api/auth/wishlist
+ * @access  Private
+ */
+const getWishlist = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id).populate('wishlist');
+
+    res.status(200).json({
+        success: true,
+        data: {
+            wishlist: user.wishlist,
+        },
+    });
+});
+
+/**
+ * @desc    Add product to wishlist
+ * @route   POST /api/auth/wishlist/:productId
+ * @access  Private
+ */
+const addToWishlist = asyncHandler(async (req, res) => {
+    const { productId } = req.params;
+    const user = await User.findById(req.user.id);
+
+    if (!user.wishlist.includes(productId)) {
+        user.wishlist.push(productId);
+        await user.save();
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Added to wishlist',
+        data: {
+            wishlist: user.wishlist,
+        },
+    });
+});
+
+/**
+ * @desc    Remove product from wishlist
+ * @route   DELETE /api/auth/wishlist/:productId
+ * @access  Private
+ */
+const removeFromWishlist = asyncHandler(async (req, res) => {
+    const { productId } = req.params;
+    const user = await User.findById(req.user.id);
+
+    user.wishlist = user.wishlist.filter(
+        (id) => id.toString() !== productId.toString()
+    );
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Removed from wishlist',
+        data: {
+            wishlist: user.wishlist,
+        },
+    });
+});
+
 module.exports = {
     register,
     login,
@@ -372,4 +434,7 @@ module.exports = {
     addAddress,
     updateAddress,
     deleteAddress,
+    getWishlist,
+    addToWishlist,
+    removeFromWishlist,
 };

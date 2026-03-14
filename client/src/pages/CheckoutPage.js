@@ -26,6 +26,8 @@ const CheckoutPage = () => {
         state: '',
         zipCode: '',
         country: 'India',
+        latitude: null,
+        longitude: null,
     });
 
     // Payment methods array removed as we only support COD now
@@ -56,6 +58,8 @@ const CheckoutPage = () => {
                     state: address.state,
                     zipCode: address.zipCode,
                     country: address.country || 'India',
+                    latitude: address.latitude,
+                    longitude: address.longitude,
                 },
                 paymentMethod,
                 notes,
@@ -191,7 +195,9 @@ const CheckoutPage = () => {
                                                             state: data.address.state || '',
                                                             zipCode: data.address.postcode || '',
                                                             country: data.address.country || 'India',
-                                                            street: `${data.address.road || ''} ${data.address.house_number || ''}`.trim()
+                                                            street: `${data.address.road || ''} ${data.address.house_number || ''}`.trim(),
+                                                            latitude,
+                                                            longitude
                                                         }));
                                                         toast.success('Location fetched successfully!', { id: toastId });
                                                     } else {

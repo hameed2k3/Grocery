@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 
 const Navbar = () => {
-    const { user, isAuthenticated, isAdmin, logout } = useAuth();
+    const { user, isAuthenticated, isAdmin, isVendor, logout } = useAuth();
     const { itemCount } = useCart();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
@@ -71,6 +71,9 @@ const Navbar = () => {
                     <Link to="/products" className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors">
                         Products
                     </Link>
+                    <Link to="/stores" className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors">
+                        Stores
+                    </Link>
                     <Link to="/products?featured=true" className="text-gray-700 dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors">
                         Deals
                     </Link>
@@ -130,6 +133,14 @@ const Navbar = () => {
                                         <span className="material-symbols-outlined text-[18px]">inventory_2</span>
                                         My Orders
                                     </Link>
+                                    <Link
+                                        to="/wishlist"
+                                        onClick={() => setShowUserMenu(false)}
+                                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">favorite</span>
+                                        Wishlist
+                                    </Link>
                                     {isAdmin && (
                                         <Link
                                             to="/admin"
@@ -138,6 +149,16 @@ const Navbar = () => {
                                         >
                                             <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
                                             Admin Panel
+                                        </Link>
+                                    )}
+                                    {isVendor && (
+                                        <Link
+                                            to="/vendor"
+                                            onClick={() => setShowUserMenu(false)}
+                                            className="flex items-center gap-2 px-4 py-2 text-sm text-orange-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        >
+                                            <span className="material-symbols-outlined text-[18px]">store</span>
+                                            Vendor Dashboard
                                         </Link>
                                     )}
                                     <button
@@ -181,6 +202,9 @@ const Navbar = () => {
                         </Link>
                         <Link to="/products" onClick={() => setShowMobileMenu(false)} className="text-gray-700 dark:text-gray-300 text-sm font-medium">
                             Products
+                        </Link>
+                        <Link to="/stores" onClick={() => setShowMobileMenu(false)} className="text-gray-700 dark:text-gray-300 text-sm font-medium">
+                            Stores
                         </Link>
                         <Link to="/products?featured=true" onClick={() => setShowMobileMenu(false)} className="text-gray-700 dark:text-gray-300 text-sm font-medium">
                             Deals
